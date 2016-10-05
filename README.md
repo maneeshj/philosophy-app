@@ -1,7 +1,8 @@
 Getting to Philosophy
 ==============
 
-The application takes a Wikipedia URL or a title as input, and displays the path taken to reach the [Philosophy page](https://en.wikipedia.org/wiki/Philosophy) by clicking the first link of each page with few rules. For more details refer - https://en.wikipedia.org/wiki/Wikipedia:Getting_to_Philosophy
+The application takes a Wikipedia URL or a title as input, and displays the path taken to reach the [Philosophy page](https://en.wikipedia.org/wiki/Philosophy) by clicking the first link of each page with few rules. <br>
+For more details refer-https://en.wikipedia.org/wiki/Wikipedia:Getting_to_Philosophy
 
 This application is built using a [Vaadin UI framework](https://vaadin.com/home) and uses MYSQL to store the transaction data.
 It also uses Redis for caching data.
