@@ -19,7 +19,8 @@ Instructions on how to run this application
 * Specifiy a new **Name** on the top(for eg: Run on jetty) 
 * For **Base directory**, click Browse Workspace and select the project
 * For **Goals**, type `jetty:run`
-* If you want to facilitate debugging for break points, go to **Source** tab and click **Add..** and select **Java Project** and  select the project. Hit **Apply** and **Run** the project
+* If you want to facilitate debugging for break points, go to **Source** tab and click **Add..** and select **Java Project** and  select the project. Hit **Apply** and **Run** the project <br>
+8) Now enter http://localhost:8080/ in the browser (8080 is the default port used) and enjoy figuring out your path towards philosophy.
  
 Implementation details
 ==============
