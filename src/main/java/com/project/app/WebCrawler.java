@@ -37,7 +37,8 @@ public class WebCrawler {
     		// Connect to the URL and get the HTML document
     		doc = GetDocumentToParse(currentUrl);
     		if(doc == null){
-    			pathToWiki.DidConnectionTimeout = true;
+    			pathToWiki.HasError = true;
+    			pathToWiki.ErrorCode = ErrorCode.PageDoesNotExistOrConnectionTimeout;
     			break;    			
     		} 		
     		// Get main page title and add it to the path
@@ -59,86 +60,39 @@ public class WebCrawler {
     		// Check if this title was already visited in any of the previous iterations. If YES, then it will result in an INFINITE loop
     		if(visitedTitles.contains(currentTitle)){
     			// loop -> return the string so far
-    			pathToWiki.IsInfiniteLoop = true;
+    			pathToWiki.HasError = true;
+    			pathToWiki.ErrorCode = ErrorCode.InfiniteLoop;
     			break;
     		}    		
     		visitedTitles.add(currentTitle);
     		
     		// Get the the paragraphs right after "mw-content-text" div tag
     		List<Element> paras = doc.getElementById(preParagraphDivId).select(">p");
-    		Element trueLink = null;
-    		// Loop through each paragraph to find the first valid link    		
-    		for(Element body : paras){            
-	            // Maintain two versions of body to exclude links inside brackets
-	            // 1. Body without brackets(body1)   2. Body with brackets (body)
-	            String bodyNobracketText = body.toString().replaceAll(bracketsRegex, "");
-	            Element bodyNobracket = Jsoup.parse(bodyNobracketText);
-	            
-	            // Get first link from body without brackets
-	            List<Element> linksNoBracket = bodyNobracket.select(hrefTag);
-	            Element linkNoBracket = null;
-	            // Ignore citation links
-	            for(int i = 0; i < linksNoBracket.size(); i++){
-	            	// Exclude external citation links, red links and links to current page
-	            	String linkAttribute = linksNoBracket.get(i).attr("href");
-	            	if(!linkAttribute.contains("#") && !linkAttribute.contains(redLinkTag)
-	            			&& !linkAttribute.contains(currentTitle)){
-	            		linkNoBracket = linksNoBracket.get(i);
-	            		break;
-	            	}
-	            }
-	            // If there are no valid links in the current paragraph, move on the next one
-	            if(linkNoBracket == null){
-	            	continue;
-	            }
-	            	            
-	            // Get all links from body with brackets
-	            List<Element> linksWithBracket = body.select(hrefTag);
-	            
-	            // Iteratively compare both links to identify the correct one
-	            for(int i = 0; i < linksWithBracket.size(); i++){
-	            	Element linkWithBracket = linksWithBracket.get(i);
-	            	String linkAttribute = linkWithBracket.attr("href");
-	            	// Compare both links
-	            	if(linkNoBracket.attr("href").length() != linkAttribute.length()
-	            			&& linkAttribute.contains(linkNoBracket.attr("href"))
-	            			&& !linkAttribute.contains("#") // external, citation links
-	            			&& !linkAttribute.contains(redLinkTag) // red links
-		            		&& !linkAttribute.contains(currentTitle)){  // links to current page
-	            		trueLink = linkWithBracket;
-	            		break;
-	            	} else if(linkNoBracket.attr("href").equals(linkWithBracket.attr("href"))){
-	            		trueLink = linkNoBracket;
-	            		break;
-	            	} else{
-	            		continue;
-	            	}
-	            }
-	            if(trueLink != null){
-	            	break;
-	            }
-    		}
+    		
+    		// Get the first valid hyperlink according to the rules:
+    		// 1) Clicking on the first non-parenthesized, non-italicized link
+    		// 2) Ignoring external links, links to the current page, or red links
+    		Element trueLink = GetTrueLink(paras, currentTitle);    		
     		
     		// Page with no outgoing links or page doesn't exist
     		if(trueLink == null){
-    			pathToWiki.HasInvalidPage = true;
+    			pathToWiki.HasError = true;
+    			pathToWiki.ErrorCode = ErrorCode.HasInValidPage;
     			break;
-    		}
-    		
+    		}    		
             trueLink.setBaseUri(baseWikiUri);            
-            String absHref = trueLink.attr("abs:href"); // "http://jsoup.org/"
-
-            System.out.println(absHref);
+            String absHref = trueLink.attr("abs:href");
             currentUrl = absHref;
     	}
-    	// Add philosophy as the last path which was not added, since parsing was not required above
-    	// Exclude error page and loops
-    	if(!(pathToWiki.IsInfiniteLoop || pathToWiki.DidConnectionTimeout || pathToWiki.HasInvalidPage)){
+  
+    	// Exclude error page, loops and timeouts
+    	if(!pathToWiki.HasError){
+    		// Add philosophy as the last path which was not added, since parsing was not required above
     		pathToWiki.Path.add(philosophyTitle);
         	pathToWiki.SetHopCount();
+        	// Cache all paths (final path + intermediate paths)
+        	CacheAllPaths(pathToWiki);
     	}   	
-    	// Cache all paths (final path + intermediate paths)
-    	CacheAllPaths(pathToWiki);
     	// Insert transaction to relational database
     	dbService.InsertPath(pathToWiki);
     	return pathToWiki;
@@ -169,6 +123,61 @@ public class WebCrawler {
 			}
 			jedisCache.SetCache(key, values);
 		}
+	}
+	
+	private Element GetTrueLink(List<Element> paras, String currentTitle){
+		Element trueLink = null;
+		// Loop through each paragraph to find the first valid link    		
+		for(Element body : paras){            
+            // Maintain two versions of body to exclude links inside brackets
+            // 1. Body without brackets(body1)   2. Body with brackets (body)
+            String bodyNobracketText = body.toString().replaceAll(bracketsRegex, "");
+            Element bodyNobracket = Jsoup.parse(bodyNobracketText);
+            
+            // Get first link from body without brackets
+            List<Element> linksNoBracket = bodyNobracket.select(hrefTag);
+            Element linkNoBracket = null;
+            // Ignore citation links
+            for(int i = 0; i < linksNoBracket.size(); i++){
+            	// Exclude external citation links, red links and links to current page
+            	String linkAttribute = linksNoBracket.get(i).attr("href");
+            	if(!linkAttribute.contains("#") && !linkAttribute.contains(redLinkTag)
+            			&& !linkAttribute.contains(currentTitle)){
+            		linkNoBracket = linksNoBracket.get(i);
+            		break;
+            	}
+            }
+            // If there are no valid links in the current paragraph, move on the next one
+            if(linkNoBracket == null){
+            	continue;
+            }          	            
+            // Get all links from body with brackets
+            List<Element> linksWithBracket = body.select(hrefTag);
+            
+            // Iteratively compare both links to identify the correct one
+            for(int i = 0; i < linksWithBracket.size(); i++){
+            	Element linkWithBracket = linksWithBracket.get(i);
+            	String linkAttribute = linkWithBracket.attr("href");
+            	// Compare both links
+            	if(linkNoBracket.attr("href").length() != linkAttribute.length()
+            			&& linkAttribute.contains(linkNoBracket.attr("href"))
+            			&& !linkAttribute.contains("#") // external, citation links
+            			&& !linkAttribute.contains(redLinkTag) // red links
+	            		&& !linkAttribute.contains(currentTitle)){  // links to current page
+            		trueLink = linkWithBracket;
+            		break;
+            	} else if(linkNoBracket.attr("href").equals(linkWithBracket.attr("href"))){
+            		trueLink = linkNoBracket;
+            		break;
+            	} else{
+            		continue;
+            	}
+            }
+            if(trueLink != null){
+            	break;
+            }
+		}
+		return trueLink;
 	}
 	
 }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class PathHelper {
 	private static final String baseWikiUri = "https://en.wikipedia.org/wiki/";
 	private static final String infiniteLoopMessage = "INFINITE LOOP";
-	private static final String timeoutMessage = "Connection timed out(please try again)";
+	private static final String pagedoesNotExisttimeoutMessage = "Page doesn't exist or Connection timed out(please try again)";
 	private static final String invalidPageMessage = "Page doesn't exist/ Page with no outgoing links";
 	
 	public static String GetPathString(PathToWiki pathToWiki){
@@ -18,11 +18,11 @@ public class PathHelper {
     		.append(currentElement).append("\"").append(">").append(currentElement).append("</a>\n");
     	}
     	
-    	if(pathToWiki.IsInfiniteLoop){
+    	if(pathToWiki.ErrorCode == ErrorCode.InfiniteLoop){
     		sb.append(" -> ").append(infiniteLoopMessage);
-    	} else if(pathToWiki.DidConnectionTimeout){
-    		sb.append(" -> ").append(timeoutMessage);
-    	} else if(pathToWiki.HasInvalidPage){
+    	} else if(pathToWiki.ErrorCode == ErrorCode.PageDoesNotExistOrConnectionTimeout){
+    		sb.append(" -> ").append(pagedoesNotExisttimeoutMessage);
+    	} else if(pathToWiki.ErrorCode == ErrorCode.HasInValidPage){
     		sb.append(" -> ").append(invalidPageMessage);
     	}
 		return sb.toString();

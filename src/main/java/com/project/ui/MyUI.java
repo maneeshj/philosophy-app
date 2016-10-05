@@ -41,12 +41,8 @@ public class MyUI extends UI {
             // Parsing
         	String value = wikiUrl.getValue();
         	String url = null;
-        	if(!value.contains("http")){
-        		url = "https://en.wikipedia.org/wiki/" + value;
-        	}
-        	else{
-        		url = value;
-        	}        	
+        	// Convert title to Wikipedia URL if necessary
+        	url = !value.contains("http") ?  "https://en.wikipedia.org/wiki/" + value : value;
         	PathToWiki path = GetPathToPhilosophy(url);
         	String pathString = GetPathString(path);
         	int hopCount = path.GetHopCount();

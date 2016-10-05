@@ -10,8 +10,7 @@ import org.json.JSONArray;
 
 import com.project.app.PathToWiki;
 
-public class DatabaseService {
-	
+public class DatabaseService {	
 	public static Connection GetConnection() throws Exception {
         String url = "jdbc:mysql://localhost:3306/";
         String dbName = "philosophy";
@@ -34,7 +33,8 @@ public class DatabaseService {
 	
 	public void InsertPath(PathToWiki pathToWiki) {
 		Connection conn = null;
-		String query = "INSERT INTO philosophy.path(source, path, hop_count, timestamp)" + "VALUES (?, ?, ?, ?)";
+		String query = "INSERT INTO philosophy.path(source, path, hop_count, timestamp, has_error, error_code)" + "VALUES (?, ?, ?, ?, ?, ?)";
+
 		try{
 			conn = GetConnection();
 			JSONArray jsArray = new JSONArray(pathToWiki.Path);
@@ -43,6 +43,8 @@ public class DatabaseService {
 			preparedStmt.setString (2, jsArray.toString());
 			preparedStmt.setInt(3, pathToWiki.GetHopCount());
 			preparedStmt.setTimestamp(4, new Timestamp(new Date().getTime()));
+			preparedStmt.setBoolean(5, pathToWiki.HasError);
+			preparedStmt.setInt(6, pathToWiki.ErrorCode);
 			preparedStmt.execute();
 		} catch(Exception e){
 			System.out.println(e.getMessage());

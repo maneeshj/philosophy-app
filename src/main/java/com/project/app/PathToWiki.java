@@ -6,9 +6,8 @@ public class PathToWiki {
 	public String SourcePage;
 	public ArrayList<String> Path;
 	private int HopCount;
-	public boolean IsInfiniteLoop;
-	public boolean DidConnectionTimeout;
-	public boolean HasInvalidPage;
+	public boolean HasError;
+	public int ErrorCode;
 	
 	public PathToWiki(){
 	}	
