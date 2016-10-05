@@ -9,18 +9,18 @@ It also uses Redis for caching data.
 
 Instructions on how to run this application
 ========
-1) Download the source code using `git clone git@github.com:maneeshj/philosophy-app.git`<br>
-2) Install **JDK, Eclipse** and open eclipse with the downloaded project in the specified workspace<br>
-3) In eclipse, go to *Help -> Eclipse MarketPlace*. Search for Vaadin plugin. Click Install.<br>
-4) Make sure **JDK** is used as the run time evironment rather than JRE. Go to *Window -> Preferences -> Java -> Installed JREs*. Locate your JDK, add it and check it and uncheck/remove if there exists a jre already.<br>
-5) Install **Redis**. For windows, you can locate it here - https://github.com/rgl/redis/downloads<br>
-6) Install MySQL server and workbench and run the queries mentioned in the [Queries.sql](https://github.com/maneeshj/philosophy-app/blob/master/src/main/java/com/project/database/Queries.sql) file located in com.project.database package. <br>
-7) Set up **Jetty** as your web server. *Run -> Run Configurations -> Maven Build(on left) -> Right click and hit new*<br>
-* Specifiy a new **Name** on the top(for eg: Run on jetty) 
-* For **Base directory**, click Browse Workspace and select the project
-* For **Goals**, type `jetty:run`
-* If you want to facilitate debugging for break points, go to **Source** tab and click **Add..** and select **Java Project** and  select the project. Hit **Apply** and **Run** the project <br>
-8) Now enter http://localhost:8080/ in the browser (8080 is the default port used) and enjoy figuring out your path towards philosophy.
+* Download the source code using `git clone git@github.com:maneeshj/philosophy-app.git`<br>
+* Install **JDK, Eclipse** and open eclipse with the downloaded project in the specified workspace<br>
+* In eclipse, go to *Help -> Eclipse MarketPlace*. Search for Vaadin plugin. Click Install.<br>
+* Make sure **JDK** is used as the run time evironment rather than JRE. Go to *Window -> Preferences -> Java -> Installed JREs*. Locate your JDK, add it and check it and uncheck/remove if there exists a jre already.<br>
+* Install **Redis**. For windows, you can locate it here - https://github.com/rgl/redis/downloads<br>
+* Install MySQL server and workbench and run the queries mentioned in the [Queries.sql](https://github.com/maneeshj/philosophy-app/blob/master/src/main/java/com/project/database/Queries.sql) file located in com.project.database package. <br>
+* Set up **Jetty** as your web server. *Run -> Run Configurations -> Maven Build(on left) -> Right click and hit new*<br>
+ * Specifiy a new **Name** on the top(for eg: Run on jetty) 
+ * For **Base directory**, click Browse Workspace and select the project
+ * For **Goals**, type `jetty:run`
+ * If you want to facilitate debugging for break points, go to **Source** tab and click **Add..** and select **Java Project** and  select the project. Hit **Apply** and **Run** the project <br>
+* Now enter http://localhost:8080/ in the browser (8080 is the default port used) and enjoy figuring out your path towards philosophy.
  
 Implementation details
 ==============
