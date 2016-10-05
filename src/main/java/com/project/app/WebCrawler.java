@@ -69,7 +69,7 @@ public class WebCrawler {
     		Element trueLink = null;
     		// Loop through each paragraph to find the first valid link    		
     		for(Element body : paras){            
-	            // Maintain two versions of body
+	            // Maintain two versions of body to exclude links inside brackets
 	            // 1. Body without brackets(body1)   2. Body with brackets (body)
 	            String bodyNobracketText = body.toString().replaceAll(bracketsRegex, "");
 	            Element bodyNobracket = Jsoup.parse(bodyNobracketText);
@@ -87,7 +87,7 @@ public class WebCrawler {
 	            		break;
 	            	}
 	            }
-	            // If there are no valid links in the current para, move on the next one
+	            // If there are no valid links in the current paragraph, move on the next one
 	            if(linkNoBracket == null){
 	            	continue;
 	            }
@@ -132,13 +132,14 @@ public class WebCrawler {
             currentUrl = absHref;
     	}
     	// Add philosophy as the last path which was not added, since parsing was not required above
+    	// Exclude error page and loops
     	if(!(pathToWiki.IsInfiniteLoop || pathToWiki.DidConnectionTimeout || pathToWiki.HasInvalidPage)){
     		pathToWiki.Path.add(philosophyTitle);
         	pathToWiki.SetHopCount();
     	}   	
     	// Cache all paths (final path + intermediate paths)
     	CacheAllPaths(pathToWiki);
-    	// Insert transaction to database
+    	// Insert transaction to relational database
     	dbService.InsertPath(pathToWiki);
     	return pathToWiki;
 	}

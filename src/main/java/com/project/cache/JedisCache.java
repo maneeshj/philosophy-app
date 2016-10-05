@@ -5,6 +5,7 @@ import redis.clients.jedis.Jedis;
 
 public class JedisCache {
 	private Jedis jedis;
+	// Key expires in 1 day(86400 seconds)
 	private static final int expirationTime = 86400;
 	
 	public JedisCache(){
@@ -17,7 +18,6 @@ public class JedisCache {
 		for(int i = 0; i < values.size(); i++){
 			jedis.zadd(key, i, values.get(i));
 		}
-		// Key expires in 1 day(86400 seconds)
 		jedis.expire(key, expirationTime);
 	}
 	
