@@ -5,7 +5,7 @@ The application takes a Wikipedia URL or a title as input, and displays the path
 For more details refer-https://en.wikipedia.org/wiki/Wikipedia:Getting_to_Philosophy
 
 This application is built using a [Vaadin UI framework](https://vaadin.com/home) and uses MYSQL to store the transaction data.
-It also uses Redis for caching data.
+It also uses [Redis](http://redis.io/) as a key-value data store for caching data.
 
 Instructions on how to run this application
 ========
